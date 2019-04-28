@@ -5,7 +5,8 @@ export default ({ DOM, HTTP }) => ({
     searchTerm$: DOM.select('.searchTerm')
         .events('input')
         .compose(debounce(300))
-        .map(v => v.target.value),
+        .map(v => v.target.value)
+        .startWith(''),
 
     searchSubmit$: xs.merge(
         DOM.select('.searchBtn')
