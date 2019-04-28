@@ -19,26 +19,9 @@ const defaultResults = [
       uname: 'Oday-YEA7',
       szf: '62 MB'
   },
-  {
-      pid: 3,
-      name: 'kjhas',
-      nname: 'Abjects',
-      cname: '#0day',
-      uname: 'OYEA7',
-      szf: '62 MB'
-  },
-  {
-      pid: 4,
-      name: 'yyy',
-      nname: 'Criten',
-      cname: '#3s',
-      uname: 'O-YEA7',
-      szf: '62 MB'
-  }
-];
+]
 
 const defaultState = {
-  term: '',
   results: defaultResults,
   page: 0,
   hasMore: false
@@ -54,11 +37,6 @@ export default intents => {
   const submitSearch$ = intents.searchBtnClick$.mapTo(state => ({
       ...state,
       page: 0
-  }));
-
-  const searchTerm$ = intents.searchTerm$.map(term => state => ({
-      ...state,
-      term
   }));
 
   const hasMorePages$ = xs
@@ -84,14 +62,13 @@ export default intents => {
       .debug('saveResult')
       .map(res => state => ({
           ...state,
-          results: res.results,
+          results: res.results || [],
           page: res.pn
       }));
 
   return xs.merge(
       defaultReducer$,
       submitSearch$,
-      searchTerm$,
       hasMorePages$,
       saveResult$,
       appendResult$

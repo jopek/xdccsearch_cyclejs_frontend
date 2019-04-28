@@ -28,29 +28,25 @@ export default sources => {
     const reducer$ = model(actions);
 
     const searchReq$ = actions.searchBtnClick$
-        .compose(sampleCombine(state$))
-        .map(([click, state]) => state)
-        .filter(state => state.term.length > 2)
-        .map(state => ({
-            url: `/api/search?q=${encodeURIComponent(state.term)}&pn=${
-                state.page
-            }`,
-            headers: { 'content-type': 'application/json' },
+        .compose(sampleCombine(actions.searchTerm$))
+        .map(([click, term]) => term)
+        .filter(term => term.length > 2)
+        .map(encodeURIComponent)
+        .map(term => ({
+            url: `/api/search?q=${term}`,
             category: 'search'
         }))
-        .debug();
 
     const loadMoreReq$ = actions.loadMoreBtnClick$
-        .compose(sampleCombine(state$))
-        .map(([click, state]) => state)
-        .map(state => ({
-            url: `/api/search?q=${encodeURIComponent(
-                state.term
-            )}&pn=${state.page + 1}`,
-            headers: { 'content-type': 'application/json' },
-            category: 'searchpage'
-        }))
-        .debug();
+        .compose(sampleCombine(actions.searchTerm$, state$))
+        .map(([click, term, state]) => {
+            const nextPage = state.page + 1;
+            const termEncoded =encodeURIComponent(term)
+            return {
+                url: `/api/search?q=${termEncoded}&pn=${nextPage}`,
+                category: 'searchpage'
+            };
+        })
 
     const resultListSinks = isolate(ResultList, 'results')(sources);
     const request$ = xs.merge(searchReq$, loadMoreReq$, resultListSinks.HTTP);
@@ -58,6 +54,6 @@ export default sources => {
     return {
         DOM: view(state$, resultListSinks.DOM),
         state: xs.merge(reducer$, resultListSinks.state),
-        HTTP: request$
+        HTTP: request$.debug()
     };
 };

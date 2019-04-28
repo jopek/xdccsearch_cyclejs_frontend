@@ -1,3 +1,4 @@
+import xs from 'xstream';
 import debounce from 'xstream/extra/debounce';
 
 export default ({ DOM, HTTP }) => ({
