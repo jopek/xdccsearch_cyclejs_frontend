@@ -7,11 +7,16 @@ export default ({ DOM, HTTP }) => ({
         .compose(debounce(300))
         .map(v => v.target.value),
 
-    loadMoreBtnClick$: DOM.select('.loadMore')
-        .events('click')
-        .mapTo(null),
+    searchSubmit$: xs.merge(
+        DOM.select('.searchBtn')
+            .events('click')
+            .mapTo(null),
+        DOM.select('.searchTerm')
+            .events('keyup')
+            .filter(ev => ev.keyCode === 13)
+    ),
 
-    searchBtnClick$: DOM.select('.searchBtn')
+    loadMoreBtnClick$: DOM.select('.loadMore')
         .events('click')
         .mapTo(null),
 

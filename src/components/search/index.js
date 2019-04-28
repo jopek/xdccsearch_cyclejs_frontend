@@ -27,7 +27,7 @@ export default sources => {
     const actions = intent(sources);
     const reducer$ = model(actions);
 
-    const searchReq$ = actions.searchBtnClick$
+    const searchReq$ = actions.searchSubmit$
         .compose(sampleCombine(actions.searchTerm$))
         .map(([click, term]) => term)
         .filter(term => term.length > 2)
