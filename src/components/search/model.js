@@ -34,7 +34,7 @@ export default intents => {
           typeof prevState === 'undefined' ? defaultState : prevState
   );
 
-  const submitSearch$ = intents.searchBtnClick$.mapTo(state => ({
+  const submitSearch$ = intents.searchSubmit$.mapTo(state => ({
       ...state,
       page: 0
   }));
