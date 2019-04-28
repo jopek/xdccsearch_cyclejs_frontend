@@ -112,7 +112,7 @@ export default intents => {
         [res.bot]: {
             ...state[res.bot],
             timestamp: res.timestamp,
-            bytes: res.bytesTotal,
+            bytes: res.bytes,
             dccstate: 'PROGRESS'
         }
     }));
