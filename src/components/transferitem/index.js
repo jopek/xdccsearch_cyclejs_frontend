@@ -1,11 +1,10 @@
 import xs from 'xstream';
-import { makeCollection } from '@cycle/state';
-import { li, ul, pre } from '@cycle/dom';
+import view from "./view";
 
 const defaultState = {
     startedTimestamp: 1556487827332,
-    duration: 59964,
     timestamp: 1556487887296,
+    duration: 59964,
     speed: 4012.14572805265,
     dccstate: 'FINISH',
     botstate: 'EXIT',
@@ -39,18 +38,16 @@ const defaultState = {
 };
 
 export default sources => {
-  const state$ = sources.state.stream;
-  const reducer$ = xs.merge(
-      xs.of(state => (!state ? defaultState : state))
-      // intent.mapTo(state => state + 'y')
-  );
+    const state$ = sources.state.stream;
+    const reducer$ = xs.merge(
+        xs.of(state => (!state ? defaultState : state))
+        // intent.mapTo(state => state + 'y')
+    );
 
-  const vdom$ = state$.map(s =>
-      li('.item', [pre([JSON.stringify(s, null, 2)])])
-  );
+    const vdom$ = view(state$)
 
-  return {
-      DOM: vdom$,
-      state: reducer$
-  };
+    return {
+        DOM: vdom$,
+        state: reducer$
+    };
 };
