@@ -1,7 +1,8 @@
 import xs from 'xstream';
-import view from "./view";
+import view from './view';
 
 const defaultState = {
+    // showMessages: true,
     startedTimestamp: 1556487827332,
     timestamp: 1556487887296,
     duration: 59964,
@@ -22,7 +23,8 @@ const defaultState = {
         pid: 555419788,
         cname: '#0day-mp3s',
         n: 337,
-        name: '[M3]_Czarface-Double_Dose_of_Danger-WEB-2019-UVU.tar',
+        name:
+            '[M3]_Czarface-Double_Dose_of_Danger-WEB-2019-UVU.tar DEFAULT STATE',
         gets: 0,
         nname: 'SceneP2P',
         naddr: 'irc.scenep2p.net',
@@ -38,13 +40,21 @@ const defaultState = {
 };
 
 export default sources => {
-    const state$ = sources.state.stream;
+    const state$ = sources.state.stream.debug('TRANSFER ITEM STATE');
+    const showMessagesClick$ = sources.DOM.select('.showMessages')
+        .events('click')
+        .mapTo(null);
     const reducer$ = xs.merge(
-        xs.of(state => (!state ? defaultState : state))
-        // intent.mapTo(state => state + 'y')
+        xs.of(state => (!state ? {} : state)),
+        showMessagesClick$.mapTo(state => {
+            return {
+                ...state,
+                showMessages: !state.showMessages
+            };
+        })
     );
 
-    const vdom$ = view(state$)
+    const vdom$ = view(state$);
 
     return {
         DOM: vdom$,

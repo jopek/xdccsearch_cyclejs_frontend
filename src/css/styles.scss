@@ -1,23 +1,7 @@
-* {
-    box-sizing: border-box;
-}
-
-pre,
-body {
-    margin: 0;
-}
-
-span,
-button,
-textarea {
-    margin-left: 0.5em;
-}
+@import "~bootstrap/scss/bootstrap";
 
 ul {
-    list-style-type: none;
-    clear: left;
     padding: 0;
-    margin: 0;
 }
 
 .search {

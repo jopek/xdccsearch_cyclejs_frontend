@@ -40,9 +40,7 @@ const defaultState = {
 };
 
 export default intents => {
-    const defaultReducer$ = xs.of(
-        prevState => (typeof prevState === 'undefined' ? {} : prevState)
-    );
+    const defaultReducer$ = xs.of(prevState => (!prevState ? {} : prevState));
 
     const saveBotInit$ = intents.botInit$.map(res => state => {
         const { type, ...initMsg } = res;
@@ -136,10 +134,7 @@ export default intents => {
         }
     }));
 
-    const saveResponse$ = intents.serverState$.map(res => state => {
-        return res
-        // return _.merge(state, res);
-    });
+    const saveResponse$ = intents.serverState$.map(res => state => res);
 
     return xs.merge(
         defaultReducer$,

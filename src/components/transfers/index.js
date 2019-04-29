@@ -6,11 +6,17 @@ import TransferList from './transferlist';
 
 const txLens = {
     get: state => Object.keys(state).map(k => state[k]),
-    set: (state, txState) => ({ ...state, [txState.bot]: txState })
+    set: (state, txState) => {
+        const newState = txState.reduce((acc, v) => {
+            acc[v.bot] = v;
+            return acc;
+        }, state);
+        return { ...newState };
+    }
 };
 
 export default sources => {
-    const state$ = sources.state.stream;
+    const state$ = sources.state.stream
     const actions = intent(sources);
     const reducer$ = model(actions);
 
@@ -29,7 +35,8 @@ export default sources => {
 
     return {
         DOM: vdom$,
-        state: reducer$,
+        state: xs.merge(reducer$, transferListSinks.state),
         HTTP: request$
+        // HTTP: xs.empty()
     };
 };
