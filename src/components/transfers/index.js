@@ -16,22 +16,20 @@ const txLens = {
 };
 
 export default sources => {
-    const state$ = sources.state.stream
+    const state$ = sources.state.stream;
     const actions = intent(sources);
     const reducer$ = model(actions);
 
     const transferListSinks = isolate(TransferList, { state: txLens })(sources);
 
     const vdom$ = transferListSinks.DOM;
-    const request$ = xs
-        .merge(
-            xs.of(null),
-            xs.periodic(15000)
-        )
-        .mapTo({
+    const request$ = xs.merge(
+        transferListSinks.HTTP,
+        xs.merge(xs.of(null), xs.periodic(15000)).mapTo({
             url: '/api/state',
             category: 'srvstate'
-        });
+        })
+    );
 
     return {
         DOM: vdom$,

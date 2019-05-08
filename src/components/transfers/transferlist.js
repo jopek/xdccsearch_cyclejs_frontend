@@ -1,6 +1,6 @@
 import xs from 'xstream';
 import { makeCollection } from '@cycle/state';
-import { li, ul, pre } from '@cycle/dom';
+import { div } from '@cycle/dom';
 import Item from "../transferitem";
 
 export default makeCollection({
@@ -11,8 +11,9 @@ export default makeCollection({
         return {
             DOM: instances
                 .pickCombine('DOM')
-                .map(itemVNodes => ul('.transfers', itemVNodes)),
-            state: instances.pickMerge('state')
+                .map(itemVNodes => div('.transfers list-group', itemVNodes)),
+            state: instances.pickMerge('state'),
+            HTTP: instances.pickMerge('HTTP')
         };
     }
 });

@@ -35,18 +35,18 @@ export default sources => {
         .map(term => ({
             url: `/api/search?q=${term}`,
             category: 'search'
-        }))
+        }));
 
     const loadMoreReq$ = actions.loadMoreBtnClick$
         .compose(sampleCombine(actions.searchTerm$, state$))
         .map(([click, term, state]) => {
             const nextPage = state.page + 1;
-            const termEncoded =encodeURIComponent(term)
+            const termEncoded = encodeURIComponent(term);
             return {
                 url: `/api/search?q=${termEncoded}&pn=${nextPage}`,
                 category: 'searchpage'
             };
-        })
+        });
 
     const resultListSinks = isolate(ResultList, 'results')(sources);
     const request$ = xs.merge(searchReq$, loadMoreReq$, resultListSinks.HTTP);
