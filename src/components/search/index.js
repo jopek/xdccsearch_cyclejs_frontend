@@ -11,9 +11,13 @@ const view = (state$, resultListDOM) => {
         .combine(state$, resultListDOM)
         .map(([state, rlist]) =>
             div('.search', [
-                div('.searchbox', [
-                    input('.searchTerm', { attrs: { value: 'lala' } }),
-                    button('.searchBtn', ['search'])
+                div('.searchbox .input-group .mb-3', [
+                    input('.searchTerm .form-control', {
+                        attrs: { value: 'lala' }
+                    }),
+                    div('.input-group-append', [
+                        button('.searchBtn .btn .btn-outline-secondary', ['search'])
+                    ])
                 ]),
                 rlist,
                 state.hasMore ? button('.loadMore', ['load more']) : null
