@@ -42,13 +42,12 @@ const defaultState = {
 export default intents => {
     const defaultReducer$ = xs.of(prevState => (!prevState ? {} : prevState));
 
-    const saveBotInit$ = intents.botInit$.map(res => state => {
-        const { type, ...initMsg } = res;
+    const saveBotInit$ = intents.botInit$.map(({type, ...res}) => state => {
         return {
             ...state,
             [res.bot]: {
                 ...state[res.bot],
-                ...initMsg,
+                ...res,
                 startedTimestamp: res.timestamp,
                 botstate: 'RUN'
             }
@@ -135,6 +134,7 @@ export default intents => {
     }));
 
     const saveResponse$ = intents.serverState$.map(res => state => res);
+    const saveServerStateWs$ = intents.serverStateWs$.map(({type, ...res}) => state => res)
 
     return xs.merge(
         defaultReducer$,
@@ -147,6 +147,7 @@ export default intents => {
         saveBotDccQueue$,
         saveBotDccProgress$,
         saveBotDccFinish$,
-        saveResponse$
+        saveResponse$,
+        saveServerStateWs$,
     );
 };

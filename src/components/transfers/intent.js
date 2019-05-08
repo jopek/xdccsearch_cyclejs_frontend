@@ -30,6 +30,9 @@ export default ({ HTTP, WS }) => {
         botDccFinish$: wsMessage$
             .filter(msgType('bot.dcc.finish'))
             .debug('botDccFinish$'),
+        serverStateWs$: wsMessage$
+            .filter(msgType('state'))
+            .debug('serverStateWs$'),
 
         serverState$: HTTP.select('srvstate')
             .map(response$ =>
