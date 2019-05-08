@@ -12,19 +12,8 @@ const duration = seconds => {
     return `${hstr}${mstr}${numseconds}s`;
 };
 
-// <div class="card border-primary mb-3" style="max-width: 18rem;">
-//     <div class="card-header">Header</div>
-//     <div class="card-body text-primary">
-//         <h5 class="card-title">Primary card title</h5>
-//         <p class="card-text">
-//             Some quick example text to build on the card title and make up the
-//             bulk of the card's content.
-//         </p>
-//     </div>
-// </div>;
-
-const styleModifier = dccstate => {
-    switch (dccstate) {
+const styleModifier = state => {
+    switch (state.dccstate) {
         case 'FINISH':
             return 'success';
 
@@ -35,18 +24,17 @@ const styleModifier = dccstate => {
             return 'danger';
 
         default:
-            return 'primary';
+            return state.botstate == 'EXIT' ? 'secondary' : 'primary';
     }
 };
 
 const progressFn = s =>
     !!s.bytesTotal ? (s.bytes / s.bytesTotal * 100).toFixed(1) : 0;
-const dccstateStyleFn = s => styleModifier(s.dccstate);
 
 const collapsedListItemView = state => {
     const pack = state.pack;
     return a(
-        `.transfer-item-toggle list-group-item .list-group-item-action .list-group-item-${dccstateStyleFn(
+        `.transfer-item-toggle list-group-item .list-group-item-action .list-group-item-${styleModifier(
             state
         )}`,
         [
@@ -59,61 +47,55 @@ const collapsedListItemView = state => {
             div('.mb-1 .d-flex .justify-content-between', [
                 span(`remote: ${pack.uname} @ ${pack.cname} on ${pack.nname}`),
                 span(`size: ${pack.szf}`),
-                span(
-                    `mode: ${
-                        state.botstate == 'RUN'
-                            ? state.dccstate
-                            : state.botstate
-                    }`
-                )
+                span(`mode: ${state.dccstate} (${state.botstate})`)
             ])
         ]
     );
 };
 
-const expandedView = (s, showMessages) => {
-    const dccstateStyle = dccstateStyleFn(s);
-    const progress = progressFn(s);
+const expandedView = (state, showMessages) => {
+    const dccstateStyle = styleModifier(state);
+    const progress = progressFn(state);
     return div(`.card .m-1 .border-${dccstateStyle}`, [
         div(
             `.transfer-item-toggle .card-header .font-weight-bold .text-${dccstateStyle}`,
-            [s.pack.name]
+            [state.pack.name]
         ),
         div('.card-body', [
             p('.card-text .d-flex .justify-content-between ', [
-                span(`transfer status: ${s.dccstate} (${s.botstate})`),
+                span(`transfer status: ${state.dccstate} (${state.botstate})`),
                 span(
-                    `progress: ${sizeFormatter(s.bytes)} / ${sizeFormatter(
-                        s.bytesTotal
+                    `progress: ${sizeFormatter(state.bytes)} / ${sizeFormatter(
+                        state.bytesTotal
                     )}`
                 ),
-                span(`time spent: ${duration(s.duration / 1000)}`),
+                span(`time spent: ${duration(state.duration / 1000)}`),
                 span(
-                    `remote: ${s.pack.uname} @ ${s.pack.cname} on ${
-                        s.pack.nname
+                    `remote: ${state.pack.uname} @ ${state.pack.cname} on ${
+                        state.pack.nname
                     } `
                 )
             ]),
             div('.progress', [
                 div(
                     `.progress-bar .progress-bar-striped .bg-${dccstateStyle} ${
-                        s.dccstate == 'PROGRESS' ? '.progress-bar-animated' : ''
+                        state.dccstate == 'PROGRESS' ? '.progress-bar-animated' : ''
                     }`,
                     { style: { width: `${progress}%` } },
-                    [`${s.pack.szf} (${progress}%)`]
+                    [`${state.pack.szf} (${progress}%)`]
                 )
             ]),
             p('.mt-4 .d-flex .justify-content-between', [
                 button('.btn .btn-primary .show-messages', ['messages']),
                 button(
                     `.btn .btn-danger .cancel-transfer `,
-                    { attrs: { disabled: s.botstate == 'EXIT' } },
+                    { attrs: { disabled: state.botstate == 'EXIT' } },
                     ['cancel transfer']
                 )
             ]),
             div(`.collapse${!!showMessages ? '.show' : ''} .messages`, [
                 div('.card .card-body', [
-                    !!s.messages ? pre(s.messages.map(x => `${x}\n`)) : null
+                    !!state.messages ? pre(state.messages.map(x => `${x}\n`)) : null
                 ])
             ])
         ])
