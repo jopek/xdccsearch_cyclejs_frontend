@@ -133,7 +133,7 @@ export default intents => {
         }
     }));
 
-    const saveResponse$ = intents.serverState$.map(res => state => res);
+    const saveServerStateResponse$ = intents.serverState$.map(res => state => res);
     const saveServerStateWs$ = intents.serverStateWs$.map(({type, ...res}) => state => res)
 
     return xs.merge(
@@ -147,7 +147,7 @@ export default intents => {
         saveBotDccQueue$,
         saveBotDccProgress$,
         saveBotDccFinish$,
-        saveResponse$,
+        saveServerStateResponse$,
         saveServerStateWs$,
     );
 };
