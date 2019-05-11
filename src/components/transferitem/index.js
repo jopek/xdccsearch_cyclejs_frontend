@@ -41,7 +41,7 @@ const defaultState = {
 };
 
 export default sources => {
-    const state$ = sources.state.stream.debug('TRANSFER ITEM STATE');
+    const state$ = sources.state.stream;
     const showMessages$ = sources.DOM.select('.show-messages')
         .events('click')
         .fold((acc, v) => !acc, false);
@@ -52,7 +52,7 @@ export default sources => {
         .events('click')
         .mapTo(null);
     const cancelTransferReq$ = cancelTransferClick$
-        .debug("cancelTransferClick$")
+        .debug('cancelTransferClick$')
         .compose(sampleCombine(state$))
         .map(([click, state]) => ({
             url: `/api/xfers/${state.bot}`,
