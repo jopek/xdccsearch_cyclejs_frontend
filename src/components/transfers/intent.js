@@ -1,38 +1,18 @@
 import xs from 'xstream';
 
-export default ({ HTTP, WS }) => {
-    const wsMessage$ = WS.map(transportEvent => transportEvent.data).map(
-        JSON.parse
-    );
-
-    const msgType = mType => message => message.type == mType;
-
+export default ({ HTTP, EB }) => {
     return {
-        botInit$: wsMessage$.filter(msgType('bot.init')).debug('botInit$'),
-        botNotice$: wsMessage$
-            .filter(msgType('bot.notice'))
-            .debug('botNotice$'),
-        botNick$: wsMessage$.filter(msgType('bot.nick')).debug('botNick$'),
-        botFail$: wsMessage$.filter(msgType('bot.fail')).debug('botFail$'),
-        botExit$: wsMessage$.filter(msgType('bot.exit')).debug('botExit$'),
-        botDccInit$: wsMessage$
-            .filter(msgType('bot.dcc.init'))
-            .debug('botDccInit$'),
-        botDccStart$: wsMessage$
-            .filter(msgType('bot.dcc.start'))
-            .debug('botDccStart$'),
-        botDccProgress$: wsMessage$
-            .filter(msgType('bot.dcc.progress'))
-            .debug('botDccProgress$'),
-        botDccQueue$: wsMessage$
-            .filter(msgType('bot.dcc.queue'))
-            .debug('botDccQueue$'),
-        botDccFinish$: wsMessage$
-            .filter(msgType('bot.dcc.finish'))
-            .debug('botDccFinish$'),
-        serverStateWs$: wsMessage$
-            .filter(msgType('state'))
-            .debug('serverStateWs$'),
+        botInit$: EB.address('bot.init').debug('botInit$'),
+        botNotice$: EB.address('bot.notice').debug('botNotice$'),
+        botNick$: EB.address('bot.nick').debug('botNick$'),
+        botFail$: EB.address('bot.fail').debug('botFail$'),
+        botExit$: EB.address('bot.exit').debug('botExit$'),
+        botDccInit$: EB.address('bot.dcc.init').debug('botDccInit$'),
+        botDccStart$: EB.address('bot.dcc.start').debug('botDccStart$'),
+        botDccProgress$: EB.address('bot.dcc.progress').debug('botDccProgress$'),
+        botDccQueue$: EB.address('bot.dcc.queue').debug('botDccQueue$'),
+        botDccFinish$: EB.address('bot.dcc.finish').debug('botDccFinish$'),
+        serverStateWs$: EB.address('state').debug('serverStateEb$'),
 
         serverState$: HTTP.select('srvstate')
             .map(response$ =>

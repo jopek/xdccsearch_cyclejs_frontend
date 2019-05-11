@@ -4,7 +4,7 @@ import { adapt } from '@cycle/run/lib/adapt';
 import { makeDOMDriver } from '@cycle/dom';
 import { makeHTTPDriver } from '@cycle/http';
 import { withState } from '@cycle/state';
-import SockJS from 'sockjs-client';
+import EventBus from 'vertx3-eventbus-client';
 // import search from './components/search';
 // import transfers from './components/transfers';
 // import Item from './components/transferitem';
@@ -16,22 +16,34 @@ const main = withState(app);
 // const main = withState(transferList);
 // const main = withState(transfers);
 
-const makeWSDriver = () => {
-    const connection = new SockJS('/sev');
-    return () => {
-        const incoming$ = xs.create({
-            start: listener => {
-                connection.onerror = err => listener.error(err);
-                connection.onmessage = msg => listener.next(msg);
-            },
-            stop: () => connection.close()
-        });
-        return adapt(incoming$);
-    };
+const makeVertxEventbusDriver = () => {
+    const eb = new EventBus('/eventbus');
+    const connectionOpened = new Promise((resolve, reject) => {
+        eb.onopen = resolve
+    });
+
+    return () => ({
+        address: address => {
+            const incoming$ = xs.create({
+                start: listener => {
+                    connectionOpened.then(() => {
+                        console.debug('eventbus on open for', address);
+                        eb.registerHandler(address, (err, msg) => {
+                            if (err) listener.error(err);
+                            // console.debug('message on', address, msg)
+                            listener.next(msg.body);
+                        });
+                    });
+                },
+                stop: () => connection.close()
+            });
+            return adapt(incoming$);
+        }
+    });
 };
 
 run(main, {
     DOM: makeDOMDriver('#app'),
     HTTP: makeHTTPDriver(),
-    WS: makeWSDriver()
+    EB: makeVertxEventbusDriver()
 });
