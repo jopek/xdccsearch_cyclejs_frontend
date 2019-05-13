@@ -30,7 +30,9 @@
         "vertx3-eventbus-client": "^3.7.0",
         "xstream": ">=11.10.0"
     },
-    "devDependencies": {},
+    "devDependencies": {
+        "@fortawesome/fontawesome-free": "^5.8.2"
+    },
     "scripts": {
         "precommit": "lint-staged",
         "format": "prettier --write '{src,test}/**/*.{js,jsx,ts,tsx}'",
