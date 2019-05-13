@@ -7,9 +7,7 @@ import intent from './intent';
 import model from './model';
 
 const view = (state$, resultListDOM) => {
-    return xs
-        .combine(state$, resultListDOM)
-        .map(([state, rlist]) =>
+    return xs.combine(state$, resultListDOM).map(([state, rlist]) =>
             div('.search', [
                 div('.searchbox .input-group .mb-3', [
                     input('.searchTerm .form-control', {
@@ -23,6 +21,19 @@ const view = (state$, resultListDOM) => {
                 state.hasMore ? button('.loadMore', ['load more']) : null
             ])
         );
+};
+
+const listLens = {
+    get: state =>
+        state.results.map(r => {
+            return {
+                ...r,
+                transferring: !!state.inTransfer[r.pid]
+            };
+        }),
+    set: (state, results) => {
+        return { ...state, results };
+    }
 };
 
 export default sources => {
@@ -52,7 +63,7 @@ export default sources => {
             };
         });
 
-    const resultListSinks = isolate(ResultList, 'results')(sources);
+    const resultListSinks = isolate(ResultList, { state: listLens })(sources);
     const request$ = xs.merge(searchReq$, loadMoreReq$, resultListSinks.HTTP);
 
     return {

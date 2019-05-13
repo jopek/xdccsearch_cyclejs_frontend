@@ -1,7 +1,7 @@
 import xs from 'xstream';
 import sampleCombine from 'xstream/extra/sampleCombine';
 import { makeCollection } from '@cycle/state';
-import { a, div, h5, p } from '@cycle/dom';
+import { a, div, h5, i } from '@cycle/dom';
 
 const itemDefaultState = {
     pid: 9999999,
@@ -26,12 +26,24 @@ const itemDefaultState = {
 
 const ResultItem = sources => {
     const state$ = sources.state.stream;
-    const click$ = sources.DOM.select('.item').events('click');
+    const click$ = sources.DOM.select('.download').events('click');
     const vdom$ = state$.map(s =>
-        a('.item .list-group-item .list-group-item-action', [
-            h5('.packname', [`${s.name}`]),
-            div('.packdetails', [`${s.uname} @ ${s.nname} / ${s.cname}, ${s.szf}`])
-        ])
+        div(
+            `.item list-group-item list-group-item-action ${
+                !!s.transferring ? 'text-black-50' : ''
+            }`,
+            [
+                div('.d-flex justify-content-between', [
+                    div([
+                        h5('.packname', [`${s.name}`]),
+                        div('.packdetails', [
+                            `${s.uname} @ ${s.nname} / ${s.cname}, ${s.szf}`
+                        ])
+                    ]),
+                    i('.download fas fa-cloud-download-alt fa-3x my-auto')
+                ])
+            ]
+        )
     );
     const reducer$ = xs.merge(
         xs.of(state => (!state ? itemDefaultState : state))
@@ -62,7 +74,9 @@ export default makeCollection({
         return {
             DOM: instances
                 .pickCombine('DOM')
-                .map(itemVNodes => div('.results .list-group .list-group-flush', itemVNodes)),
+                .map(itemVNodes =>
+                    div('.results list-group list-group-flush', itemVNodes)
+                ),
             state: instances.pickMerge('state'),
             HTTP: instances.pickMerge('HTTP')
         };
