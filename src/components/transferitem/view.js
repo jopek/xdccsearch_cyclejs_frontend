@@ -34,17 +34,17 @@ const progressFn = s =>
 const collapsedListItemView = state => {
     const pack = state.pack;
     return a(
-        `.transfer-item-toggle list-group-item .list-group-item-action .list-group-item-${styleModifier(
+        `.transfer-item-toggle list-group-item list-group-item-action list-group-item-${styleModifier(
             state
         )}`,
         [
-            div('.d-flex .justify-content-between', [
+            div('.d-flex justify-content-between', [
                 h5('.mb-1', [`${pack.name}`]),
-                span('.badge .badge-primary .badge-pill', [
+                span('.badge badge-primary badge-pill', [
                     `${progressFn(state)}%`
                 ])
             ]),
-            div('.mb-1 .d-flex .justify-content-between', [
+            div('.mb-1 d-flex justify-content-between', [
                 span(`remote: ${pack.uname} @ ${pack.cname} on ${pack.nname}`),
                 span(`size: ${pack.szf}`),
                 span(`mode: ${state.dccstate} (${state.botstate})`)
@@ -56,13 +56,13 @@ const collapsedListItemView = state => {
 const expandedView = (state, showMessages) => {
     const dccstateStyle = styleModifier(state);
     const progress = progressFn(state);
-    return div(`.card .m-1 .border-${dccstateStyle}`, [
+    return div(`.card m-1 border-${dccstateStyle}`, [
         div(
-            `.transfer-item-toggle .card-header .font-weight-bold .text-${dccstateStyle}`,
+            `.transfer-item-toggle card-header font-weight-bold text-${dccstateStyle}`,
             [state.pack.name]
         ),
         div('.card-body', [
-            p('.card-text .d-flex .justify-content-between ', [
+            p('.card-text d-flex justify-content-between', [
                 span(`transfer status: ${state.dccstate} (${state.botstate})`),
                 span(
                     `progress: ${sizeFormatter(state.bytes)} / ${sizeFormatter(
@@ -78,24 +78,28 @@ const expandedView = (state, showMessages) => {
             ]),
             div('.progress', [
                 div(
-                    `.progress-bar .progress-bar-striped .bg-${dccstateStyle} ${
-                        state.dccstate == 'PROGRESS' ? '.progress-bar-animated' : ''
+                    `.progress-bar progress-bar-striped bg-${dccstateStyle} ${
+                        state.dccstate == 'PROGRESS'
+                            ? 'progress-bar-animated'
+                            : ''
                     }`,
                     { style: { width: `${progress}%` } },
                     [`${state.pack.szf} (${progress}%)`]
                 )
             ]),
-            p('.mt-4 .d-flex .justify-content-between', [
-                button('.btn .btn-primary .show-messages', ['messages']),
+            p('.mt-4 d-flex justify-content-between', [
+                button('.btn btn-primary show-messages', ['messages']),
                 button(
-                    `.btn .btn-danger .cancel-transfer `,
+                    `.btn btn-danger cancel-transfer `,
                     { attrs: { disabled: state.botstate == 'EXIT' } },
                     ['cancel transfer']
                 )
             ]),
-            div(`.collapse${!!showMessages ? '.show' : ''} .messages`, [
-                div('.card .card-body', [
-                    !!state.messages ? pre(state.messages.map(x => `${x}\n`)) : null
+            div(`.collapse${!!showMessages ? 'show' : ''} messages`, [
+                div('.card card-body', [
+                    !!state.messages
+                        ? pre(state.messages.map(x => `${x}\n`))
+                        : null
                 ])
             ])
         ])
