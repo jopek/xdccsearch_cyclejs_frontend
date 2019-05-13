@@ -23,7 +23,7 @@ const makeVertxEventbusDriver = () => {
                         });
                     });
                 },
-                stop: () => connection.close()
+                stop: () => connectionOpened.then(() => eb.unregisterHandler(address))
             });
             return adapt(incoming$);
         }
