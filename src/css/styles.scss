@@ -8,6 +8,10 @@ $fa-font-path : "~@fortawesome/fontawesome-free/webfonts";
 
 .results {
   .item {
+    div > div {
+      max-width: 90%;
+  }
+
     i.download {
       cursor: pointer;
     }
@@ -17,3 +21,4 @@ $fa-font-path : "~@fortawesome/fontawesome-free/webfonts";
     }
   }
 }
+

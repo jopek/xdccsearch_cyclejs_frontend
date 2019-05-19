@@ -18,7 +18,11 @@ const view = (state$, resultListDOM) => {
                 ])
             ]),
             rlist,
-            state.hasMore ? button('.loadMore', ['load more']) : null
+            state.hasMore
+                ? button('.loadMore d-block btn btn-primary mt-3 mx-auto', [
+                      'load more'
+                  ])
+                : null
         ])
     );
 };

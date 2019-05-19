@@ -35,7 +35,7 @@ const ResultItem = sources => {
             [
                 div('.d-flex justify-content-between', [
                     div([
-                        h5('.packname', [`${s.name}`]),
+                        h5('.packname text-truncate', [`${s.name}`]),
                         div('.packdetails', [
                             `${s.uname} @ ${s.nname} / ${s.cname}, ${s.szf}`
                         ])
