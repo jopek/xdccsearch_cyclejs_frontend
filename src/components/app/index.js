@@ -1,8 +1,9 @@
 import xs from 'xstream';
 import isolate from '@cycle/isolate';
-import { div, hr, pre } from '@cycle/dom';
+import { div, hr, pre, span, button, i } from '@cycle/dom';
 import Search from '../search';
 import Transfer from '../transfers';
+import ClosableCard from '../closablecard';
 
 const defaultState = {
     search: {
@@ -29,19 +30,29 @@ const searchLens = {
 
 export default sources => {
     const state$ = sources.state.stream;
-    const searchSinks = isolate(Search, { state: searchLens })(sources);
-    const transfersSinks = isolate(Transfer, 'transfers')(sources);
+
+    const searchSinks = isolate(ClosableCard(Search), {
+        state: searchLens
+    })({
+        ...sources,
+        props: xs.of({ title: 'Search' })
+    });
+
+    const transfersSinks = isolate(ClosableCard(Transfer), 'transfers')({
+        ...sources,
+        props: xs.of({ title: 'Transfers' })
+    });
 
     const vdom$ = xs
         .combine(state$, searchSinks.DOM, transfersSinks.DOM)
-        .map(([state, search, transfers]) =>
-            div('.app', [transfers, hr(), search])
-        );
+        .map(([state, search, transfers]) => div([transfers, search]));
+
     const reducer$ = xs.merge(
         xs.of(state => (!!state ? state : defaultState)),
         searchSinks.state,
         transfersSinks.state
     );
+
     return {
         DOM: vdom$,
         state: reducer$,
