@@ -3,7 +3,7 @@ import isolate from '@cycle/isolate';
 import { div, hr, pre, span, button, i } from '@cycle/dom';
 import Search from '../search';
 import Transfer from '../transfers';
-import ClosableCard from '../closablecard';
+import { ClosableCard } from '../closablecard';
 
 const defaultState = {
     search: {

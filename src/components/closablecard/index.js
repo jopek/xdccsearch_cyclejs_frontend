@@ -1,7 +1,7 @@
 import xs from 'xstream';
 import { button, div, h3, span } from '@cycle/dom';
 
-const Wrapper = child => sources => {
+const ClosableCard = child => sources => {
     // debugger
     sources.state.stream.debug('Wrapper state');
     const closeContent$ = sources.DOM.select('.doClose')
@@ -32,4 +32,4 @@ const Wrapper = child => sources => {
     };
 };
 
-export default Wrapper;
+export { ClosableCard } ;
