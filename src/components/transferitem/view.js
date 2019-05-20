@@ -45,7 +45,9 @@ const collapsedListItemView = state => {
                 ])
             ]),
             div('.mb-1 d-flex justify-content-between', [
-                span(`remote: ${pack.uname} @ ${pack.cname} on ${pack.nname}`),
+                span([span('. far fa-user'), span(` ${pack.uname}`)]),
+                span([span('. fas fa-hashtag'), span(` ${pack.cname}`)]),
+                span([span('. fas fa-cloud'), span(` ${pack.nname}`)]),
                 span(`size: ${pack.szf}`),
                 span(`mode: ${state.dccstate} (${state.botstate})`)
             ])
@@ -56,6 +58,7 @@ const collapsedListItemView = state => {
 const expandedView = (state, showMessages) => {
     const dccstateStyle = styleModifier(state);
     const progress = progressFn(state);
+    const pack = state.pack;
     return div(`.card m-1 border-${dccstateStyle}`, [
         div(
             `.transfer-item-toggle card-header font-weight-bold text-${dccstateStyle}`,
@@ -70,11 +73,9 @@ const expandedView = (state, showMessages) => {
                     )}`
                 ),
                 span(`time spent: ${duration(state.duration / 1000)}`),
-                span(
-                    `remote: ${state.pack.uname} @ ${state.pack.cname} on ${
-                        state.pack.nname
-                    } `
-                )
+                span([span('. far fa-user'), span(` ${pack.uname}`)]),
+                span([span('. fas fa-hashtag'), span(` ${pack.cname}`)]),
+                span([span('. fas fa-cloud'), span(` ${pack.nname}`)]),
             ]),
             div('.progress', [
                 div(
