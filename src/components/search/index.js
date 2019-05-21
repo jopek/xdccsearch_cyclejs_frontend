@@ -1,6 +1,6 @@
 import xs from 'xstream';
 import sampleCombine from 'xstream/extra/sampleCombine';
-import { div, button, input } from '@cycle/dom';
+import { div, button, input, h1, span } from '@cycle/dom';
 import isolate from '@cycle/isolate';
 import ResultList from './resultlist';
 import intent from './intent';
@@ -17,7 +17,11 @@ const view = (state$, resultListDOM) => {
                     button('.searchBtn btn btn-outline-secondary', ['search'])
                 ])
             ]),
-            rlist,
+            state.results.length > 0
+                ? rlist
+                : div('. jumbotron', [
+                      h1('. display-4 text-black-50', [span('. fas fa-search'), 'no results'])
+                  ]),
             state.hasMore
                 ? button('.loadMore d-block btn btn-primary mt-3 mx-auto', [
                       'load more'
