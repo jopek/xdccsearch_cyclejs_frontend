@@ -12,8 +12,8 @@ const renderInfo = (phrase, loading, error) => {
 
     if (phrase.length > 0)
         return div('. alert alert-light', [
-            h3('. d-inline', `search results for '${phrase}': `),
-            loading ? span('.spinner-border spinner-border-sm') : null
+            h3('. d-inline', `| search results for '${phrase}'`),
+            loading ? span('. spinner-border spinner-border-sm') : null
         ]);
 
     return null;
@@ -50,11 +50,9 @@ const view = (
                     renderInfo(phrase, searchIsError, searchIsLoading),
                     state.results.length > 0
                         ? rlist
-                        : div('. jumbotron', [
-                              h1('. display-4 text-black-50', [
-                                  span('. fas fa-search'),
-                                  'no results'
-                              ])
+                        : h1('. display-4 text-black-50 text-center', [
+                              span('. fas fa-search mr-3'),
+                              'no results'
                           ]),
                     state.hasMore
                         ? button(
