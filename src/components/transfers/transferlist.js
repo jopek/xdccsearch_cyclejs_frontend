@@ -1,7 +1,7 @@
 import xs from 'xstream';
 import { makeCollection } from '@cycle/state';
 import { div } from '@cycle/dom';
-import Item from "../transferitem";
+import Item from "./transferitem";
 
 export default makeCollection({
     item: Item,
