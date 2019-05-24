@@ -34,13 +34,13 @@ export default intents => {
             typeof prevState === 'undefined' ? defaultState : prevState
     );
 
-    const submitSearch$ = intents.searchSubmit$.mapTo(state => ({
+    const submitSearch$ = intents.searchPhrase$.mapTo(state => ({
         ...state,
         page: 0
     }));
 
     const hasMorePages$ = xs
-        .merge(intents.searchResults$, intents.searchPageResults$)
+        .merge(intents.searchResponse$, intents.searchPageResults$)
         .map(res => state => {
             const resultListDefined = res.results !== undefined;
             const morePages = res.pc - (res.pn + 1) > 0;
@@ -58,7 +58,7 @@ export default intents => {
             page: res.pn
         }));
 
-    const saveResult$ = intents.searchResults$
+    const saveResult$ = intents.searchResponse$
         .debug('saveResult')
         .map(res => state => ({
             ...state,
