@@ -54,7 +54,9 @@ export default intents => {
         .debug('appendResult')
         .map(res => state => ({
             ...state,
-            results: state.results.concat(res.results || []),
+            results: state.results.concat(
+                (res.results || []).filter(item => item.uname)
+            ),
             page: res.pn
         }));
 
@@ -62,7 +64,7 @@ export default intents => {
         .debug('saveResult')
         .map(res => state => ({
             ...state,
-            results: res.results || [],
+            results: (res.results || []).filter(item => item.uname),
             page: res.pn
         }));
 
