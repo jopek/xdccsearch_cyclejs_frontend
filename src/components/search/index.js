@@ -78,7 +78,7 @@ const listLens = {
 };
 
 export default sources => {
-    const state$ = sources.state.stream.debug('state');
+    const state$ = sources.state.stream;
 
     const actions = intent(sources);
 
