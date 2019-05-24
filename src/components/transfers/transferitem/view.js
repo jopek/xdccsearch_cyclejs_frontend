@@ -38,18 +38,12 @@ const collapsedListItemView = state => {
             state
         )}`,
         [
-            div('.d-flex justify-content-between', [
-                h5('.mb-1', [`${pack.name}`]),
-                span('.badge badge-primary badge-pill', [
-                    `${progressFn(state)}%`
-                ])
-            ]),
+            h5('.mb-1', [`${pack.name}`]),
             div('.mb-1 d-flex justify-content-between', [
                 span([span('. far fa-user'), span(` ${pack.uname}`)]),
-                span([span('. fas fa-hashtag'), span(` ${pack.cname}`)]),
+                span([span('. font-weight-bold mr-1', '#'), span(`${pack.cname.substring(1)}`)]),
                 span([span('. fas fa-cloud'), span(` ${pack.nname}`)]),
-                span(`size: ${pack.szf}`),
-                span(`mode: ${state.dccstate} (${state.botstate})`)
+                span(`${pack.szf} (${progressFn(state)}%)`)
             ])
         ]
     );
@@ -66,16 +60,19 @@ const expandedView = (state, showMessages) => {
         ),
         div('.card-body', [
             p('.card-text d-flex justify-content-between', [
-                span(`transfer status: ${state.dccstate} (${state.botstate})`),
+                span(`${state.dccstate} (${state.botstate})`),
                 span(
-                    `progress: ${sizeFormatter(state.bytes)} / ${sizeFormatter(
+                    `${sizeFormatter(state.bytes)} / ${sizeFormatter(
                         state.bytesTotal
                     )}`
                 ),
-                span(`time spent: ${duration(state.duration / 1000)}`),
+                span([
+                    span('. far fa-hourglass'),
+                    span(` ${duration(state.duration / 1000)}`)
+                ]),
                 span([span('. far fa-user'), span(` ${pack.uname}`)]),
-                span([span('. fas fa-hashtag'), span(` ${pack.cname}`)]),
-                span([span('. fas fa-cloud'), span(` ${pack.nname}`)]),
+                span([span('. font-weight-bold mr-1', '#'), span(`${pack.cname.substring(1)}`)]),
+                span([span('. fas fa-cloud'), span(` ${pack.nname}`)])
             ]),
             div('.progress', [
                 div(
