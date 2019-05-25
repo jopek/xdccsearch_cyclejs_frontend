@@ -4,6 +4,7 @@ import { div, hr, pre, span, button, i } from '@cycle/dom';
 import Search from '../search';
 import Transfer from '../transfers';
 import { ClosableCard } from '../closablecard';
+import WebsocketState from "./websocketState";
 
 const defaultState = {
     search: {
@@ -44,8 +45,19 @@ export default sources => {
     });
 
     const vdom$ = xs
-        .combine(state$, searchSinks.DOM, transfersSinks.DOM)
-        .map(([state, search, transfers]) => div([transfers, search]));
+        .combine(
+            state$,
+            searchSinks.DOM,
+            transfersSinks.DOM,
+            WebsocketState(sources).DOM
+        )
+        .map(([state, search, transfers, wsr]) =>
+            div([
+                wsr,
+                transfers,
+                search
+            ])
+        );
 
     const reducer$ = xs.merge(
         xs.of(state => (!!state ? state : defaultState)),

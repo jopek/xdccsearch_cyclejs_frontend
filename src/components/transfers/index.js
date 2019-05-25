@@ -21,14 +21,22 @@ export default sources => {
     const reducer$ = model(actions);
 
     const transferListSinks = isolate(TransferList, { state: txLens })(sources);
+    const wsReady$ = sources.EB.wsReady$;
 
     const vdom$ = transferListSinks.DOM;
     const request$ = xs.merge(
         transferListSinks.HTTP,
-        xs.merge(xs.of(null), xs.periodic(15000)).mapTo({
+        xs
+            .merge(
+                // xs.of(null),
+                //xs.periodic(15000)
+                wsReady$.filter(wsReady => wsReady == true)
+            )
+            .mapTo({
             url: '/api/state',
             category: 'srvstate'
         })
+            .debug('transfer state request')
     );
 
     return {

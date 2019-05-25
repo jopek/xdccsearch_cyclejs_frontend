@@ -5,15 +5,20 @@ import EventBus from 'vertx3-eventbus-client';
 const makeVertxEventbusDriver = () => {
     const eb = new EventBus('/eventbus');
     const handlers = {};
+    const wsReady$ = xs.create().startWith(false);
+    wsReady$.addListener({});
+
     const connectionOpened = new Promise((resolve, reject) => {
         eb.onopen = () => {
             Object.keys(handlers).map(address => {
                 console.debug('reregistering eventbus handler for', address);
                 eb.registerHandler(address, handlers[address]);
             });
+            wsReady$.shamefullySendNext(true);
             resolve();
         };
     });
+    eb.onclose = () => wsReady$.shamefullySendNext(false);
     eb.enableReconnect(true);
 
     return () => ({
@@ -38,7 +43,8 @@ const makeVertxEventbusDriver = () => {
                     connectionOpened.then(() => eb.unregisterHandler(address))
             });
             return adapt(incoming$);
-        }
+        },
+        wsReady$
     });
 };
 
