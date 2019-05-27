@@ -1,7 +1,7 @@
 import xs from 'xstream';
 import sampleCombine from 'xstream/extra/sampleCombine';
 import { makeCollection } from '@cycle/state';
-import { a, div, h5, i } from '@cycle/dom';
+import { span, div, h5, i } from '@cycle/dom';
 
 const itemDefaultState = {
     pid: 9999999,
@@ -36,9 +36,12 @@ const ResultItem = sources => {
                 div('.d-flex justify-content-between', [
                     div([
                         h5('.packname text-truncate', [`${s.name}`]),
-                        div('.packdetails', [
-                            `${s.uname} @ ${s.nname} / ${s.cname}, ${s.szf}`
-                        ])
+                        div('.mb-1 d-flex justify-content-between', [
+                            span([span('. far fa-user'), span(` ${s.uname}`)]),
+                            span([span('. font-weight-bold mr-1', '#'), span(`${s.cname.substring(1)}`)]),
+                            span([span('. fas fa-cloud'), span(` ${s.nname}`)]),
+                            s.szf
+                        ]),
                     ]),
                     i('.download fas fa-cloud-download-alt fa-3x my-auto')
                 ])
