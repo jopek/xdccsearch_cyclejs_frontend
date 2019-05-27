@@ -7,14 +7,27 @@ import { SearchBar } from './searchbar';
 import intent from './intent';
 import model from './model';
 
-const renderInfo = (phrase, loading, error) => {
+const renderLoadingSpinner = loading =>
+    span('. spinner-border spinner-border ml-auto fade ', {
+        class: { show: loading }
+    });
+
+const renderInfo = (phrase, loading, error, hasResults) => {
     if (error) return div('. alert alert-danger', ['error loading response']);
 
-    if (phrase.length > 0)
-        return div('. alert alert-light', [
-            h3('. d-inline', `| search results for '${phrase}'`),
-            loading ? span('. spinner-border spinner-border-sm') : null
+    const hasPhrase = phrase.length > 0;
+    const v = (loading, message) =>
+        div('. alert alert-light d-flex', [
+            h3('. d-inline', `${message}`),
+            renderLoadingSpinner(loading)
         ]);
+
+    if (!loading && !hasResults && hasPhrase)
+        return v(loading, `no search results for "${phrase}"`);
+
+    // if (!loading && hasResults && hasPhrase) return v(loading, `results for "${phrase}"`);
+    // if (loading && hasPhrase) return v(loading, `searching for "${phrase}"`);
+    if (hasPhrase) return v(loading, `results for "${phrase}"`);
 
     return null;
 };
@@ -47,13 +60,13 @@ const view = (
             ]) =>
                 div('.search', [
                     searchBar,
-                    renderInfo(phrase, searchIsError, searchIsLoading),
-                    state.results.length > 0
-                        ? rlist
-                        : h1('. display-4 text-black-50 text-center', [
-                              span('. fas fa-search mr-3'),
-                              'no results'
-                          ]),
+                    renderInfo(
+                        phrase,
+                        searchIsError,
+                        searchIsLoading,
+                        state.results.length > 0
+                    ),
+                    rlist,
                     state.hasMore
                         ? button(
                               '.loadMore d-block btn btn-primary mt-3 mx-auto',
@@ -106,7 +119,8 @@ export default sources => {
     const reducer$ = model({
         ...actions,
         searchPhrase$: searchBarSinks.searchPhrase$,
-        searchResponse$: searchBarSinks.searchResponse$
+        searchResponse$: searchBarSinks.searchResponse$,
+        searchIsError$: searchBarSinks.isError$
     });
 
     return {

@@ -47,18 +47,21 @@ const SearchBar = sources => {
         div('. SearchBar input-group mb-3', [
             input('. searchTerm form-control', {
                 attrs: {
-                    type: 'text'
+                    type: 'text',
+                    autofocus: true,
+                    placeholder: 'enter search phrase'
                 },
                 props: {
                     value: searchPhrase
                 }
             }),
             div('. input-group-append', [
-                button(
-                    `. submitBtn btn btn-outline-secondary fas fa-${
-                        searchPhrase ? 'times' : 'search'
-                    }`
-                )
+                button('. submitBtn btn btn-outline-secondary fas', {
+                    class: {
+                        'fa-times': searchPhrase.length > 0,
+                        'fa-search': searchPhrase.length === 0
+                    }
+                })
             ])
         ])
     );

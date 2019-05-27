@@ -13,15 +13,20 @@ const ClosableCard = child => sources => {
     const vdom$ = xs
         .combine(closeContent$, childSinks.DOM, props$)
         .map(([close, cvdom, props]) =>
-            div(`. card mx-2 mt-2 mb-${close ? 2 : 5}`, [
+            div('. card mx-2 mt-2 mb-2', [
                 div('. card-header font-weight-bold text-secondary', [
                     button(
                         '. btn btn-sm btn-outline-secondary mr-3 doClose',
-                        span(`. fas fa-chevron-${close ? 'down' : 'up'}`)
+                        span('. fas ', {
+                            class: {
+                                'fa-chevron-down': close,
+                                'fa-chevron-up': !close
+                            }
+                        })
                     ),
                     h3('. d-inline align-top', props.title)
                 ]),
-                div(`.card-body collapse ${close ? '' : 'show'}`, cvdom)
+                div('. card-body collapse', { class: { show: !close } }, cvdom)
             ])
         );
     return {
