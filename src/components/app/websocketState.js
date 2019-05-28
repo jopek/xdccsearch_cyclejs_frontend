@@ -8,7 +8,7 @@ export default sources => ({
                 : div('. alert alert-warning text-center', [
                       h3([
                           span('. fas fa-exclamation-triangle mr-2'),
-                          'websocked closed'
+                          'cannot connect to server'
                       ])
                   ])
     )
