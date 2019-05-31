@@ -22,6 +22,7 @@ const makeVertxEventbusDriver = () => {
     eb.enableReconnect(true);
 
     return () => ({
+        // selector for eventbus addresses
         address: address => {
             const incoming$ = xs.create({
                 start: listener => {
@@ -31,8 +32,10 @@ const makeVertxEventbusDriver = () => {
                             address
                         );
                         const handler = (err, msg) => {
-                            if (err) listener.error(err);
-                            // console.debug('message on', address, msg)
+                            if (err) {
+                                listener.error(err);
+                                return;
+                            }
                             listener.next(msg.body);
                         };
                         eb.registerHandler(address, handler);
@@ -44,6 +47,7 @@ const makeVertxEventbusDriver = () => {
             });
             return adapt(incoming$);
         },
+        // websocket ready stream (connection opened = true / connection closed = false)
         wsReady$
     });
 };
