@@ -21,7 +21,7 @@ const makeVertxEventbusDriver = () => {
         // selector for eventbus addresses
         address: address => {
             const incoming$ = xs.create({
-                start: listener => {
+                start: listener =>
                     wsReady$
                         .filter(c => c === true)
                         .addListener({
@@ -38,8 +38,7 @@ const makeVertxEventbusDriver = () => {
                                     listener.next(msg.body);
                                 });
                             }
-                        });
-                },
+                        }),
                 stop: () =>
                     wsReady$
                         .filter(c => c === true)
