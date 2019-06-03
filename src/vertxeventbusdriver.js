@@ -1,49 +1,51 @@
 import xs from 'xstream';
+import dropRepeats from 'xstream/extra/dropRepeats';
 import { adapt } from '@cycle/run/lib/adapt';
 import EventBus from 'vertx3-eventbus-client';
 
 const makeVertxEventbusDriver = () => {
     const eb = new EventBus('/eventbus');
-    const handlers = {};
-    const wsReady$ = xs.create().startWith(false);
-    wsReady$.addListener({});
-
-    const connectionOpened = new Promise((resolve, reject) => {
-        eb.onopen = () => {
-            Object.keys(handlers).map(address => {
-                console.debug('reregistering eventbus handler for', address);
-                eb.registerHandler(address, handlers[address]);
-            });
-            wsReady$.shamefullySendNext(true);
-            resolve();
-        };
-    });
-    eb.onclose = () => wsReady$.shamefullySendNext(false);
     eb.enableReconnect(true);
+
+    const wsReady$ = xs
+        .create({
+            start: listener => {
+                eb.onopen = () => listener.next(true);
+                eb.onclose = () => listener.next(false);
+            },
+            stop: () => {}
+        })
+        .compose(dropRepeats());
 
     return () => ({
         // selector for eventbus addresses
         address: address => {
             const incoming$ = xs.create({
                 start: listener => {
-                    connectionOpened.then(() => {
-                        console.debug(
-                            'registering eventbus handler for',
-                            address
-                        );
-                        const handler = (err, msg) => {
-                            if (err) {
-                                listener.error(err);
-                                return;
+                    wsReady$
+                        .filter(c => c === true)
+                        .addListener({
+                            next: c => {
+                                console.debug(
+                                    'registering eventbus handler for',
+                                    address
+                                );
+                                eb.registerHandler(address, (err, msg) => {
+                                    if (err) {
+                                        listener.error(err);
+                                        return;
+                                    }
+                                    listener.next(msg.body);
+                                });
                             }
-                            listener.next(msg.body);
-                        };
-                        eb.registerHandler(address, handler);
-                        handlers[address] = handler;
-                    });
+                        });
                 },
                 stop: () =>
-                    connectionOpened.then(() => eb.unregisterHandler(address))
+                    wsReady$
+                        .filter(c => c === true)
+                        .addListener({
+                            next: c => eb.unregisterHandler(address)
+                        })
             });
             return adapt(incoming$);
         },
