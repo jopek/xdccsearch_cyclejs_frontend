@@ -9,9 +9,12 @@ export default ({ HTTP, EB }) => {
         botExit$: EB.address('bot.exit').debug('botExit$'),
         botDccInit$: EB.address('bot.dcc.init').debug('botDccInit$'),
         botDccStart$: EB.address('bot.dcc.start').debug('botDccStart$'),
-        botDccProgress$: EB.address('bot.dcc.progress').debug('botDccProgress$'),
+        botDccProgress$: EB.address('bot.dcc.progress').debug(
+            'botDccProgress$'
+        ),
         botDccQueue$: EB.address('bot.dcc.queue').debug('botDccQueue$'),
         botDccFinish$: EB.address('bot.dcc.finish').debug('botDccFinish$'),
+        botsRemoved$: EB.address('removed').debug('botsRemoved$'),
         serverStateWs$: EB.address('state').debug('serverStateEb$'),
 
         serverState$: HTTP.select('srvstate')

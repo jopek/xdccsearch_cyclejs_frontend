@@ -42,7 +42,7 @@ const defaultState = {
 export default intents => {
     const defaultReducer$ = xs.of(prevState => (!prevState ? {} : prevState));
 
-    const saveBotInit$ = intents.botInit$.map(({type, ...res}) => state => {
+    const saveBotInit$ = intents.botInit$.map(({ type, ...res }) => state => {
         return {
             ...state,
             [res.bot]: {
@@ -93,6 +93,13 @@ export default intents => {
         }
     }));
 
+    const removedStaleBots$ = intents.botsRemoved$.map(removedBots => state =>
+        Object.keys(state).reduce((p, k) => {
+            if (!removedBots.includes(k)) p[k] = state[k];
+            return p;
+        }, {})
+    );
+
     const saveBotDccStart$ = intents.botDccStart$.map(res => state => ({
         ...state,
         [res.bot]: {
@@ -133,8 +140,12 @@ export default intents => {
         }
     }));
 
-    const saveServerStateResponse$ = intents.serverState$.map(res => state => res);
-    const saveServerStateWs$ = intents.serverStateWs$.map(({type, ...res}) => state => res)
+    const saveServerStateResponse$ = intents.serverState$.map(res => state =>
+        res
+    );
+    const saveServerStateWs$ = intents.serverStateWs$.map(
+        ({ type, ...res }) => state => res
+    );
 
     return xs.merge(
         defaultReducer$,
@@ -147,7 +158,8 @@ export default intents => {
         saveBotDccQueue$,
         saveBotDccProgress$,
         saveBotDccFinish$,
+        removedStaleBots$,
         saveServerStateResponse$,
-        saveServerStateWs$,
+        saveServerStateWs$
     );
 };
