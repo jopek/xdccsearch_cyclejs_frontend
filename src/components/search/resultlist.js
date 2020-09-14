@@ -2,7 +2,7 @@ import xs from 'xstream';
 import sampleCombine from 'xstream/extra/sampleCombine';
 import { makeCollection } from '@cycle/state';
 import { span, div, h5, i } from '@cycle/dom';
-
+import { sizeFormatter } from '../utils';
 const itemDefaultState = {
     pid: 9999999,
     name: 'XXXXXXXXXXXXXXXXXXXXXXXX',
@@ -21,13 +21,13 @@ const itemDefaultState = {
     age: 1543571979,
     agef: '146 day ago',
     last: 1556195684,
-    lastf: '2 hr ago'
+    lastf: '2 hr ago',
 };
 
-const ResultItem = sources => {
+const ResultItem = (sources) => {
     const state$ = sources.state.stream;
     const click$ = sources.DOM.select('.download').events('click');
-    const vdom$ = state$.map(s =>
+    const vdom$ = state$.map((s) =>
         div(
             `.item list-group-item list-group-item-action ${
                 !!s.transferring ? 'text-black-50' : ''
@@ -38,50 +38,53 @@ const ResultItem = sources => {
                         h5('.packname text-truncate', [`${s.name}`]),
                         div('.mb-1 d-flex justify-content-between', [
                             span([span('. far fa-user'), span(` ${s.uname}`)]),
-                            span([span('. font-weight-bold mr-1', '#'), span(`${s.cname.substring(1)}`)]),
+                            span([
+                                span('. font-weight-bold mr-1', '#'),
+                                span(`${s.cname.substring(1)}`),
+                            ]),
                             span([span('. fas fa-cloud'), span(` ${s.nname}`)]),
-                            s.szf
+                            sizeFormatter(s.sz),
                         ]),
                     ]),
-                    i('.download fas fa-cloud-download-alt fa-3x my-auto')
-                ])
+                    i('.download fas fa-cloud-download-alt fa-3x my-auto'),
+                ]),
             ]
         )
     );
     const reducer$ = xs.merge(
-        xs.of(state => (!state ? itemDefaultState : state))
+        xs.of((state) => (!state ? itemDefaultState : state))
         // intent.mapTo(state => state + 'y')
     );
     const request$ = click$
         .compose(sampleCombine(state$))
         .map(([c, state]) => state)
-        .map(state => ({
+        .map((state) => ({
             url: `/api/xfers`,
             method: 'post',
             headers: { 'content-type': 'application/json' },
             category: 'startXfer',
-            send: state
+            send: state,
         }));
     return {
         DOM: vdom$,
         state: reducer$,
-        HTTP: request$
+        HTTP: request$,
     };
 };
 
 export default makeCollection({
     item: ResultItem,
     itemKey: (childState, index) => index,
-    itemScope: key => key, // use `key` string as the isolation scope
-    collectSinks: instances => {
+    itemScope: (key) => key, // use `key` string as the isolation scope
+    collectSinks: (instances) => {
         return {
             DOM: instances
                 .pickCombine('DOM')
-                .map(itemVNodes =>
+                .map((itemVNodes) =>
                     div('.results list-group list-group-flush', itemVNodes)
                 ),
             state: instances.pickMerge('state'),
-            HTTP: instances.pickMerge('HTTP')
+            HTTP: instances.pickMerge('HTTP'),
         };
-    }
+    },
 });
