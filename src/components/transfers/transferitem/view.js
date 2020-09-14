@@ -1,6 +1,6 @@
 import { a, button, div, h5, li, p, pre, small, span } from '@cycle/dom';
 import xs from 'xstream';
-import { sizeFormatter } from './utils';
+import { sizeFormatter } from '../../utils';
 const duration = (seconds) => {
     const numhours = Math.floor(seconds / 3600);
     const numminutes = Math.floor((seconds % 3600) / 60);
