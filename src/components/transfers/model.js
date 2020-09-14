@@ -12,7 +12,7 @@ const defaultState = {
             '[\u0002Logon News\u0002 - May 21 2011] \u0002First time on Rizon? Be sure to read the FAQ! http://s.rizon.net/FAQ',
             '[\u0002Logon News\u0002 - Dec 16 2013] Own a large/active channel or plan to get one going? Please read http://s.rizon.net/authline',
             '[\u0002Random News\u0002 - Mar 20 2009] Idle on Rizon a lot? Why not play our idlerpg game, you can check it out at #RizonIRPG for more information visit the website http://idlerpg.rizon.net -Rizon Staff',
-            'bot Oday-YEA7 not in channel #0day-mp3s'
+            'bot Oday-YEA7 not in channel #0day-mp3s',
         ],
         oldBotNames: [],
         bot: 'i7il',
@@ -34,117 +34,136 @@ const defaultState = {
             age: 0,
             agef: null,
             last: 0,
-            lastf: null
-        }
-    }
+            lastf: null,
+        },
+    },
 };
 
-export default intents => {
-    const defaultReducer$ = xs.of(prevState => (!prevState ? {} : prevState));
+export default (intents) => {
+    const defaultReducer$ = xs.of((prevState) => (!prevState ? {} : prevState));
 
-    const saveBotInit$ = intents.botInit$.map(({ type, ...res }) => state => {
+    const saveBotInit$ = intents.botInit$.map(({ type, ...res }) => (state) => {
         return {
             ...state,
             [res.bot]: {
                 ...state[res.bot],
                 ...res,
-                startedTimestamp: res.timestamp,
-                botstate: 'RUN'
-            }
+                started: res.timestamp,
+                botstate: 'RUN',
+            },
         };
     });
 
-    const saveBotNotice$ = intents.botNotice$.map(res => state => ({
-        ...state,
-        [res.bot]: {
-            ...state[res.bot],
-            timestamp: res.timestamp,
-            messages: (state[res.bot].messages || []).concat(res.message)
-        }
-    }));
-
-    const saveBotFail$ = intents.botFail$.map(res => state => ({
-        ...state,
-        [res.bot]: {
-            ...state[res.bot],
-            messages: (state[res.bot].messages || []).concat(res.message),
-            timestamp: res.timestamp,
-            dccstate: 'FAIL'
-        }
-    }));
-
-    const saveBotDccQueue$ = intents.botDccQueue$.map(res => state => ({
+    const saveBotNotice$ = intents.botNotice$.map((res) => (state) => ({
         ...state,
         [res.bot]: {
             ...state[res.bot],
             timestamp: res.timestamp,
             messages: (state[res.bot].messages || []).concat(res.message),
-            dccstate: 'QUEUE'
-        }
+        },
     }));
 
-    const saveBotDccInit$ = intents.botDccInit$.map(res => state => ({
+    const saveBotFail$ = intents.botFail$.map((res) => (state) => ({
+        ...state,
+        [res.bot]: {
+            ...state[res.bot],
+            messages: (state[res.bot].messages || []).concat(res.message),
+            timestamp: res.timestamp,
+            dccstate: 'FAIL',
+        },
+    }));
+
+    const saveBotDccQueue$ = intents.botDccQueue$.map((res) => (state) => ({
+        ...state,
+        [res.bot]: {
+            ...state[res.bot],
+            timestamp: res.timestamp,
+            messages: (state[res.bot].messages || []).concat(res.message),
+            dccstate: 'QUEUE',
+        },
+    }));
+
+    const saveBotDccInit$ = intents.botDccInit$.map((res) => (state) => ({
         ...state,
         [res.bot]: {
             ...state[res.bot],
             timestamp: res.timestamp,
             filename: res.filename,
-            dccstate: 'INIT'
-        }
+            dccstate: 'INIT',
+        },
     }));
 
-    const removedStaleBots$ = intents.botsRemoved$.map(removedBots => state =>
+    const updatedDuration$ = intents.count$.mapTo((state) =>
         Object.keys(state).reduce((p, k) => {
-            if (!removedBots.includes(k)) p[k] = state[k];
+            p[k] = state[k];
+            if (
+                p[k].botstate === 'EXIT' ||
+                ['FINISH', 'FAIL'].includes(p[k].dccState)
+            ) {
+                p[k].duration = p[k].timestamp - p[k].started;
+            } else {
+                console.log('recalculate duration');
+                p[k].duration = Date.now() - p[k].started;
+            }
             return p;
         }, {})
     );
 
-    const saveBotDccStart$ = intents.botDccStart$.map(res => state => ({
+    const removedStaleBots$ = intents.botsRemoved$.map(
+        (removedBots) => (state) =>
+            Object.keys(state).reduce((p, k) => {
+                if (!removedBots.includes(k)) p[k] = state[k];
+                return p;
+            }, {})
+    );
+
+    const saveBotDccStart$ = intents.botDccStart$.map((res) => (state) => ({
         ...state,
         [res.bot]: {
             ...state[res.bot],
             timestamp: res.timestamp,
             bytesTotal: res.bytesTotal,
             filenameOnDisk: res.filenameOnDisk,
-            dccstate: 'START'
-        }
+            dccstate: 'START',
+        },
     }));
 
-    const saveBotDccProgress$ = intents.botDccProgress$.map(res => state => ({
+    const saveBotDccProgress$ = intents.botDccProgress$.map(
+        (res) => (state) => ({
+            ...state,
+            [res.bot]: {
+                ...state[res.bot],
+                timestamp: res.timestamp,
+                bytes: res.bytes,
+                dccstate: 'PROGRESS',
+            },
+        })
+    );
+
+    const saveBotDccFinish$ = intents.botDccFinish$.map((res) => (state) => ({
         ...state,
         [res.bot]: {
             ...state[res.bot],
             timestamp: res.timestamp,
-            bytes: res.bytes,
-            dccstate: 'PROGRESS'
-        }
+            dccstate: 'FINISH',
+        },
     }));
 
-    const saveBotDccFinish$ = intents.botDccFinish$.map(res => state => ({
-        ...state,
-        [res.bot]: {
-            ...state[res.bot],
-            timestamp: res.timestamp,
-            dccstate: 'FINISH'
-        }
-    }));
-
-    const saveBotExit$ = intents.botExit$.map(res => state => ({
+    const saveBotExit$ = intents.botExit$.map((res) => (state) => ({
         ...state,
         [res.bot]: {
             ...state[res.bot],
             messages: (state[res.bot].messages || []).concat(res.message),
             timestamp: res.timestamp,
-            botstate: 'EXIT'
-        }
+            botstate: 'EXIT',
+        },
     }));
 
-    const saveServerStateResponse$ = intents.serverState$.map(res => state =>
-        res
+    const saveServerStateResponse$ = intents.serverState$.map(
+        (res) => (state) => res
     );
     const saveServerStateWs$ = intents.serverStateWs$.map(
-        ({ type, ...res }) => state => res
+        ({ type, ...res }) => (state) => res
     );
 
     return xs.merge(
@@ -160,6 +179,7 @@ export default intents => {
         saveBotDccFinish$,
         removedStaleBots$,
         saveServerStateResponse$,
-        saveServerStateWs$
+        saveServerStateWs$,
+        updatedDuration$
     );
 };

@@ -1,6 +1,6 @@
 import xs from 'xstream';
 
-export default ({ HTTP, EB }) => {
+export default ({ HTTP, EB, TIME }) => {
     return {
         botInit$: EB.address('bot.init').debug('botInit$'),
         botNotice$: EB.address('bot.notice').debug('botNotice$'),
@@ -16,13 +16,14 @@ export default ({ HTTP, EB }) => {
         botDccFinish$: EB.address('bot.dcc.finish').debug('botDccFinish$'),
         botsRemoved$: EB.address('removed').debug('botsRemoved$'),
         serverStateWs$: EB.address('state').debug('serverStateEb$'),
+        count$: TIME.periodic(1000),
 
         serverState$: HTTP.select('srvstate')
-            .map(response$ =>
-                response$.replaceError(e => xs.of({ ...e, body: {} }))
+            .map((response$) =>
+                response$.replaceError((e) => xs.of({ ...e, body: {} }))
             )
             .flatten()
-            .map(res => res.body)
-            .debug('server state response')
+            .map((res) => res.body)
+            .debug('server state response'),
     };
 };

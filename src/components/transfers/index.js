@@ -3,20 +3,36 @@ import isolate from '@cycle/isolate';
 import intent from './intent';
 import model from './model';
 import TransferList from './transferlist';
+import dropRepeats from 'xstream/extra/dropRepeats';
 
 const txLens = {
-    get: state => Object.keys(state).map(k => state[k]),
+    get: (state) => Object.keys(state).map((k) => state[k]),
     set: (state, txState) => {
         const newState = txState.reduce((acc, v) => {
             acc[v.bot] = v;
             return acc;
         }, state);
         return { ...newState };
-    }
+    },
 };
 
-export default sources => {
-    const state$ = sources.state.stream;
+export default (sources) => {
+    // const state$ =
+    sources.state.stream
+        .map((s) =>
+            Object.keys(s)
+                .map((k) => s[k])
+                .map(({ bot, duration, started, timestamp }) => ({
+                    bot,
+                    duration,
+                    timestamp,
+                }))
+        )
+        .map(JSON.stringify)
+        .compose(dropRepeats())
+        .debug('state')
+        .addListener({ next: () => {} });
+
     const actions = intent(sources);
     const reducer$ = model(actions);
 
@@ -30,19 +46,19 @@ export default sources => {
             .merge(
                 // xs.of(null),
                 //xs.periodic(15000)
-                wsReady$.filter(wsReady => wsReady == true)
+                wsReady$.filter((wsReady) => wsReady == true)
             )
             .mapTo({
-            url: '/api/state',
-            category: 'srvstate'
-        })
+                url: '/api/state',
+                category: 'srvstate',
+            })
             .debug('transfer state request')
     );
 
     return {
         DOM: vdom$,
         state: xs.merge(reducer$, transferListSinks.state),
-        HTTP: request$
+        HTTP: request$,
         // HTTP: xs.empty()
     };
 };

@@ -12,7 +12,7 @@ const defaultState = {
     botstate: 'EXIT',
     messages: [
         '** Sending you pack #337 ("[M3]_Czarface-Double_Dose_of_Danger-WEB-2019-UVU.tar"), which is 68MB. (resume supported)',
-        'bot jjzm exiting because: finished transfer'
+        'bot jjzm exiting because: finished transfer',
     ],
     oldBotNames: [],
     bot: 'jjzm',
@@ -36,12 +36,12 @@ const defaultState = {
         age: 1556434011,
         agef: '14 hr ago',
         last: 1556448437,
-        lastf: '10 hr ago'
-    }
+        lastf: '10 hr ago',
+    },
 };
 
-export default sources => {
-    const state$ = sources.state.stream;
+export default (sources) => {
+    const state$ = sources.state.stream.debug('transferitem state');
     const showMessages$ = sources.DOM.select('.show-messages')
         .events('click')
         .fold((acc, v) => !acc, false);
@@ -57,16 +57,16 @@ export default sources => {
         .map(([click, state]) => ({
             url: `/api/xfers/${state.bot}`,
             method: 'DELETE',
-            category: 'cancelXfer'
+            category: 'cancelXfer',
         }))
         .debug();
-    const reducer$ = xs.merge(xs.of(state => (!state ? {} : state)));
+    const reducer$ = xs.merge(xs.of((state) => (!state ? {} : state)));
 
     const vdom$ = view(state$, viewExpandedMode$, showMessages$);
 
     return {
         DOM: vdom$,
         state: reducer$,
-        HTTP: cancelTransferReq$
+        HTTP: cancelTransferReq$,
     };
 };
