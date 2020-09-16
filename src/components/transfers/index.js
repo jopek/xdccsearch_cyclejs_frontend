@@ -6,7 +6,7 @@ import TransferList from './transferlist';
 import dropRepeats from 'xstream/extra/dropRepeats';
 
 const txLens = {
-    get: (state) => Object.keys(state).map((k) => state[k]),
+    get: (state) => Object.keys(state).map((k) => ({ ...state[k] })),
     set: (state, txState) => {
         const newState = txState.reduce((acc, v) => {
             acc[v.bot] = v;
