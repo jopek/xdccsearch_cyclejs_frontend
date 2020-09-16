@@ -14,6 +14,7 @@ export default ({ HTTP, EB, TIME }) => {
         ),
         botDccQueue$: EB.address('bot.dcc.queue').debug('botDccQueue$'),
         botDccFinish$: EB.address('bot.dcc.finish').debug('botDccFinish$'),
+        botDccFail$: EB.address('bot.dcc.fail').debug('botDccFail$'),
         botsRemoved$: EB.address('removed').debug('botsRemoved$'),
         serverStateWs$: EB.address('state').debug('serverStateEb$'),
         count$: TIME.periodic(1000),

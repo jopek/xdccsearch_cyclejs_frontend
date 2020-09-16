@@ -83,6 +83,16 @@ export default (intents) => {
         },
     }));
 
+    const saveBotDccFail$ = intents.botDccFail$.map((res) => (state) => ({
+        ...state,
+        [res.bot]: {
+            ...state[res.bot],
+            timestamp: res.timestamp,
+            messages: (state[res.bot].messages || []).concat(res.message),
+            dccstate: 'FAIL',
+        },
+    }));
+
     const saveBotDccInit$ = intents.botDccInit$.map((res) => (state) => ({
         ...state,
         [res.bot]: {
@@ -176,6 +186,7 @@ export default (intents) => {
         saveBotDccQueue$,
         saveBotDccProgress$,
         saveBotDccFinish$,
+        saveBotDccFail$,
         removedStaleBots$,
         saveServerStateResponse$,
         saveServerStateWs$,
