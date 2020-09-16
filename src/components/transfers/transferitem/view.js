@@ -57,7 +57,6 @@ const expandedView = (state, showMessages) => {
     const progress = progressFn(state);
     const pack = state.pack;
 
-    console.log(state.bot, state.duration);
     return div(`.card m-1 border-${dccstateStyle}`, [
         div(
             `.transfer-item-toggle card-header font-weight-bold text-${dccstateStyle}`,

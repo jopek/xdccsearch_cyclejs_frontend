@@ -3,7 +3,6 @@ import isolate from '@cycle/isolate';
 import intent from './intent';
 import model from './model';
 import TransferList from './transferlist';
-import dropRepeats from 'xstream/extra/dropRepeats';
 
 const txLens = {
     get: (state) => Object.keys(state).map((k) => ({ ...state[k] })),
@@ -17,22 +16,6 @@ const txLens = {
 };
 
 export default (sources) => {
-    // const state$ =
-    sources.state.stream
-        .map((s) =>
-            Object.keys(s)
-                .map((k) => s[k])
-                .map(({ bot, duration, started, timestamp }) => ({
-                    bot,
-                    duration,
-                    timestamp,
-                }))
-        )
-        .map(JSON.stringify)
-        .compose(dropRepeats())
-        .debug('state')
-        .addListener({ next: () => {} });
-
     const actions = intent(sources);
     const reducer$ = model(actions);
 

@@ -98,11 +98,10 @@ export default (intents) => {
             p[k] = state[k];
             if (
                 p[k].botstate === 'EXIT' ||
-                ['FINISH', 'FAIL'].includes(p[k].dccState)
+                ['FINISH', 'FAIL'].includes(p[k].dccstate)
             ) {
                 p[k].duration = p[k].timestamp - p[k].started;
             } else {
-                console.log('recalculate duration');
                 p[k].duration = Date.now() - p[k].started;
             }
             return p;
