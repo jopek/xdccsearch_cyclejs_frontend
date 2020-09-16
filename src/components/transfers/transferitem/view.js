@@ -46,7 +46,7 @@ const collapsedListItemView = (state) => {
                     span(`${pack.cname.substring(1)}`),
                 ]),
                 span([span('. fas fa-cloud'), span(` ${pack.nname}`)]),
-                span(`${pack.szf} (${progressFn(state)}%)`),
+                span(`${sizeFormatter(state.bytes)} (${progressFn(state)}%)`),
             ]),
         ]
     );
@@ -89,7 +89,7 @@ const expandedView = (state, showMessages) => {
                             : ''
                     }`,
                     { style: { width: `${progress}%` } },
-                    [`${state.pack.szf} (${progress}%)`]
+                    [`${sizeFormatter(state.bytes)} (${progress}%)`]
                 ),
             ]),
             p('.mt-4 d-flex justify-content-between', [
