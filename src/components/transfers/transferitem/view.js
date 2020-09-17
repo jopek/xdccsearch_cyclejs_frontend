@@ -1,15 +1,24 @@
 import { a, button, div, h5, li, p, pre, small, span } from '@cycle/dom';
 import xs from 'xstream';
 import { sizeFormatter } from '../../utils';
-const duration = (seconds) => {
+
+const pad = (num, size) => {
+    let s = num + '';
+    while (s.length < size) s = '0' + s;
+    return s;
+};
+
+const duration = (millis) => {
+    const seconds = Math.round(millis / 1000);
     const numhours = Math.floor(seconds / 3600);
     const numminutes = Math.floor((seconds % 3600) / 60);
     const numseconds = Math.floor(seconds % 3600) % 60;
 
-    const hstr = numhours > 0 ? `${numhours}h` : '';
-    const mstr = numminutes > 0 ? `${numminutes}m` : '';
+    const hstr = numhours > 0 ? `${pad(numhours, 2)}:` : '';
+    const mstr = pad(numminutes, 2);
+    const sstr = pad(numseconds, 2);
 
-    return `${hstr}${mstr}${numseconds}s`;
+    return `${hstr}${mstr}:${sstr}`;
 };
 
 const styleModifier = (state) => {
@@ -72,7 +81,7 @@ const expandedView = (state, showMessages) => {
                 ),
                 span([
                     span('. far fa-hourglass'),
-                    span(` ${duration(Math.round(state.duration / 1000))}`),
+                    span(` ${duration(state.duration)}`),
                 ]),
                 span([span('. far fa-user'), span(` ${pack.uname}`)]),
                 span([
